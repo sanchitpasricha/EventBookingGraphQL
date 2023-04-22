@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const graphqlHttp = require("express-graphql").graphqlHTTP;
 const { buildSchema } = require("graphql");
+const mongoose = require("mongoose");
 
 const app = express();
 
@@ -64,6 +65,15 @@ app.use(
   })
 );
 
-app.listen(3000, () => {
-  console.log("Server running");
-});
+mongoose
+  .connect(
+    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.sda1shk.mongodb.net/${process.env.MONGO_DB}`
+  )
+  .then(() => {
+    app.listen(3000, () => {
+      console.log("Server running & DB connected");
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
