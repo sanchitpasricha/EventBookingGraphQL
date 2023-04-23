@@ -76,14 +76,29 @@ app.use(
           description: args.eventInput.description,
           price: args.eventInput.price,
           date: new Date(args.eventInput.date),
+          creator: "6444491ffbd35c71aac88b8c",
         });
+
+        let createdEvent;
 
         //using return below to tell graphql that it will be an async func.
         return event
           .save()
           .then((result) => {
-            console.log(result);
-            return { ...result._doc };
+            createdEvent = { ...result._doc };
+            return User.findById("6444491ffbd35c71aac88b8c");
+          })
+          .then((user) => {
+            if (!user) {
+              throw new Error("User not found!");
+            }
+
+            //createdEvents in user model
+            user.createdEvents.push(event);
+            return user.save();
+          })
+          .then((result) => {
+            return createdEvent;
           })
           .catch((err) => {
             console.log(err);
